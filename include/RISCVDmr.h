@@ -97,6 +97,10 @@ class RISCVDmr : public llvm::MachineFunctionPass {
   // mapping between primary and shadow registers
 
   // TODO: static constexpr??
+  // TODO: perhaps we could use a static std::array for this mapping as iterations over it (while searching for
+  // inverse lookup) might be more faster due to cache-friendliness -> have to measure to be sure of it -> also
+  // maybe this initial map implementation anyways might not be affecting run-time performance that much compared to
+  // other compiler passes
   const RegMapType P2S_{{llvm::RISCV::X0, llvm::RISCV::X27},   // zero  : s11
                         {llvm::RISCV::X1, llvm::RISCV::X7},    // ra    : t2
                         {llvm::RISCV::X2, llvm::RISCV::X9},    // sp    : s1
@@ -164,6 +168,9 @@ class RISCVDmr : public llvm::MachineFunctionPass {
                         {llvm::RISCV::F15_H, llvm::RISCV::F29_H},
                         {llvm::RISCV::F16_H, llvm::RISCV::F30_H},
                         {llvm::RISCV::F17_H, llvm::RISCV::F31_H}};
+  // TODO: for free registers in repair, perhaps we could use a `std::queue<llvm::Register>` to push (pop) registers
+  // as they become free (used)
+
   // TODO: static constexpr??
   const std::map<llvm::Register, std::string> Reg2Name_{
       {llvm::RISCV::X0, "zero"},      {llvm::RISCV::X1, "ra"},        {llvm::RISCV::X2, "sp"},
@@ -233,7 +240,12 @@ class RISCVDmr : public llvm::MachineFunctionPass {
       llvm::RISCV::F25_H, llvm::RISCV::F26_H, llvm::RISCV::F27_H};
   // pointer to error-BB that is introduced in this pass
   llvm::MachineBasicBlock* err_bb_{nullptr};
+
   // for convenience, we collect special instruction points in containers
+  //   TODO: possibly we can use unordered_set as container for efficiency reasons??
+  // - we don't have requirements for values (instr-point ptrs) to have any sort of order so `set` is not mandatory
+  // - inserting new values will be faster in `unordered_set` on average
+  // - iterating would be faster on set
   std::set<llvm::MachineInstr*> stores_{};
   // std::set<llvm::MachineInstr *> stores_to_protect_{};
   std::set<llvm::MachineInstr*> user_calls_{};
@@ -242,13 +254,24 @@ class RISCVDmr : public llvm::MachineFunctionPass {
   std::set<llvm::MachineInstr*> loads_{};
   std::set<llvm::MachineInstr*> shadow_loads_{};
   std::set<llvm::MachineBasicBlock*> exit_bbs_{};
+
   llvm::MachineBasicBlock* entry_bb_{nullptr};
+  //   TODO: static constexpr as config??
   bool uses_FPregfile_{false};
+  //   TODO: static constexpr??
   const std::set<llvm::Register> reserved_fp_primary_{llvm::RISCV::F8_F, llvm::RISCV::F8_D, llvm::RISCV::F8_H};
+
+  // for convenience, we collect special instruction points in containers
+  //   TODO: possibly we can use unordered_set as container for efficiency reasons??
+  // - we don't have requirements for values (instr-point ptrs) to have any sort of order so `set` is not mandatory
+  // - inserting new values will be faster in `unordered_set` on average
+  // - iterating would be faster on set
   std::set<llvm::MachineBasicBlock*> nemesis_bbs_{};
   std::set<llvm::MachineInstr*> loadbacks_{};
   std::set<llvm::MachineInstr*> indirect_calls_{};
+
   std::string fname_{};
+  //   TODO: static constexpr as config??
   bool use_shadow_for_stack_ops_{true};
   int frame_size_{0};
 

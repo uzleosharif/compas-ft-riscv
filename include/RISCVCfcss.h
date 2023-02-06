@@ -27,7 +27,7 @@ class RISCVCfcss : public RISCVDmr {
   // constructor
   RISCVCfcss();
   // override the transformation function
-  bool runOnMachineFunction(llvm::MachineFunction &) override;
+  bool runOnMachineFunction(llvm::MachineFunction&) override;
 
  private:
   struct MBBInfo {
@@ -35,7 +35,7 @@ class RISCVCfcss : public RISCVDmr {
     unsigned d{0};
     bool is_fanin{false};
     unsigned s_i1{0};
-    std::set<llvm::MachineBasicBlock *> predecessors{};
+    std::set<llvm::MachineBasicBlock*> predecessors{};
   };
 
   // G register in paper
@@ -43,9 +43,9 @@ class RISCVCfcss : public RISCVDmr {
   // D register in paper
   const unsigned kD{P2S_.at(kG)};
   // pointer to error-bb that is introdcued in this pass.
-  llvm::MachineBasicBlock *cf_err_bb_{nullptr};
+  llvm::MachineBasicBlock* cf_err_bb_{nullptr};
   // map each MBB to its info
-  std::map<llvm::MachineBasicBlock *, MBBInfo> mbb_info_{};
+  std::map<llvm::MachineBasicBlock*, MBBInfo> mbb_info_{};
 
   // for initialization purposes
   void init();
@@ -55,5 +55,5 @@ class RISCVCfcss : public RISCVDmr {
   // error detection we end up in this block
   void insertErrorBB() override;
   // utility function to test if a passed in MBB has both succ as fanin-nodes
-  bool hasMultipleFaninSBB(llvm::MachineBasicBlock *);
+  bool hasMultipleFaninSBB(llvm::MachineBasicBlock*);
 };

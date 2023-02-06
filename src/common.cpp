@@ -58,10 +58,8 @@ riscv_common::RegType riscv_common::getRegType(llvm::Register r) {
   }
 }
 
-void riscv_common::saveRegs(std::vector<llvm::Register> regs,
-                            llvm::MachineBasicBlock *MBB,
-                            llvm::MachineBasicBlock::iterator mbb_it,
-                            llvm::Register sp) {
+void riscv_common::saveRegs(std::vector<llvm::Register> regs, llvm::MachineBasicBlock* MBB,
+                            llvm::MachineBasicBlock::iterator mbb_it, llvm::Register sp) {
   if (regs.size() == 0) {
     return;
   }
@@ -85,27 +83,20 @@ void riscv_common::saveRegs(std::vector<llvm::Register> regs,
 
   // now saving onto stack one by one
   unsigned stack_offset{0};
-  for (const auto &r : regs) {
+  for (const auto& r : regs) {
     if (getRegType(r) != RegType::I) {
-      store_opcode = (isa_config.store_opcode == llvm::RISCV::SW)
-                         ? llvm::RISCV::FSW
-                         : llvm::RISCV::FSD;
+      store_opcode = (isa_config.store_opcode == llvm::RISCV::SW) ? llvm::RISCV::FSW : llvm::RISCV::FSD;
     } else {
       store_opcode = isa_config.store_opcode;
     }
 
-    llvm::BuildMI(*MBB, mbb_it, DLL, TII->get(store_opcode))
-        .addReg(r)
-        .addReg(kSP)
-        .addImm(stack_offset);
+    llvm::BuildMI(*MBB, mbb_it, DLL, TII->get(store_opcode)).addReg(r).addReg(kSP).addImm(stack_offset);
     stack_offset += isa_config.word_length;
   }
 }
 
-void riscv_common::loadRegs(std::vector<llvm::Register> regs,
-                            llvm::MachineBasicBlock *MBB,
-                            llvm::MachineBasicBlock::iterator mbb_it,
-                            llvm::Register sp) {
+void riscv_common::loadRegs(std::vector<llvm::Register> regs, llvm::MachineBasicBlock* MBB,
+                            llvm::MachineBasicBlock::iterator mbb_it, llvm::Register sp) {
   if (regs.size() == 0) {
     return;
   }
@@ -117,19 +108,14 @@ void riscv_common::loadRegs(std::vector<llvm::Register> regs,
 
   // loading from stack one by one
   unsigned stack_offset{0};
-  for (auto &r : regs) {
+  for (auto& r : regs) {
     if (getRegType(r) != RegType::I) {
-      load_opcode = (isa_config.load_opcode == llvm::RISCV::LW)
-                        ? llvm::RISCV::FLW
-                        : llvm::RISCV::FLD;
+      load_opcode = (isa_config.load_opcode == llvm::RISCV::LW) ? llvm::RISCV::FLW : llvm::RISCV::FLD;
     } else {
       load_opcode = isa_config.load_opcode;
     }
 
-    llvm::BuildMI(*MBB, mbb_it, DLL, TII->get(load_opcode))
-        .addReg(r)
-        .addReg(sp)
-        .addImm(stack_offset);
+    llvm::BuildMI(*MBB, mbb_it, DLL, TII->get(load_opcode)).addReg(r).addReg(sp).addImm(stack_offset);
     stack_offset += isa_config.word_length;
   }
 

@@ -54,12 +54,12 @@ const unsigned kFP{llvm::RISCV::X8};
 RegType getRegType(llvm::Register);
 // save registers in the vector one by one onto the stack and do this
 // at the instruction point pointed to by iterator
-void saveRegs(std::vector<llvm::Register>, llvm::MachineBasicBlock*,
-              llvm::MachineBasicBlock::iterator, llvm::Register sp = kSP);
+void saveRegs(std::vector<llvm::Register>, llvm::MachineBasicBlock*, llvm::MachineBasicBlock::iterator,
+              llvm::Register sp = kSP);
 // load regs to the vector ony by one from the stack and do this
 // at the instruction point pointed to by iterator
-void loadRegs(std::vector<llvm::Register>, llvm::MachineBasicBlock*,
-              llvm::MachineBasicBlock::iterator, llvm::Register sp = kSP);
+void loadRegs(std::vector<llvm::Register>, llvm::MachineBasicBlock*, llvm::MachineBasicBlock::iterator,
+              llvm::Register sp = kSP);
 
 template <class ContainerT, class ValueT>
 bool setmapContains(const ContainerT& c, const ValueT& v) {

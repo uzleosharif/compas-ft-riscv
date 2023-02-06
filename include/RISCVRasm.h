@@ -27,7 +27,7 @@ class RISCVRasm : public RISCVDmr {
   // constructor
   RISCVRasm();
   // override the transformation function
-  bool runOnMachineFunction(llvm::MachineFunction &) override;
+  bool runOnMachineFunction(llvm::MachineFunction&) override;
 
  private:
   // RTS register
@@ -35,14 +35,14 @@ class RISCVRasm : public RISCVDmr {
   // check register
   const unsigned kC{P2S_.at(kRTS)};
   // pointer to err-bb that is introdcued in this pass
-  llvm::MachineBasicBlock *cf_err_bb_{nullptr};
+  llvm::MachineBasicBlock* cf_err_bb_{nullptr};
   // map each MBB to its signatures
-  std::map<llvm::MachineBasicBlock *, std::pair<short, short>> mbb_sigs_{};
+  std::map<llvm::MachineBasicBlock*, std::pair<short, short>> mbb_sigs_{};
   // for random number generation using uniform distribution
   std::default_random_engine gen_{};
   std::uniform_int_distribution<short> unif_dist_{-500, 500};
   // for convenience
-  std::set<llvm::MachineBasicBlock *> err_bbs_{};
+  std::set<llvm::MachineBasicBlock*> err_bbs_{};
 
   // for initialization purposes
   void init();
